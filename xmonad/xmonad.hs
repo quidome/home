@@ -40,32 +40,33 @@ myHiddenColor = "#dddddd"
 --myLayoutColor = "#666666"
 myLayoutColor = "#ebac54"
 myUrgentColor = "#2b9ac8"
+myIFGColor = myLayoutColor
 myIcon name = myHome ++ "/.xmonad/dzen/" ++ name ++ ".xbm"
+myIconDir = myHome ++ "/.dzen/dzenIcons"
 
-myDzenFGColor = "#555555"
-myNormalFGColor = "#ffffff"
-myNormalBGColor = "#0f0f0f"
+-- size needed for conky
+myConkyWidth = "360"
+myScreenWidth = "1280"
+myDzenX = "110"
+-- use myConkyWidth to determine placing
+-- myConkyWidth
+-- myScreenWidth
+-- myDzenX
+
+myConky = "920"
+myDzenWidth = "810"
 
 -- font settings
-myFont = "xft:ProggyTiny:pixelsize=10"
---myFont = "-*-montecarlo-medium-r-normal-*-11-*-*-*-c-*-*-*"
---myFont = "-xos4-terminus-medium-r-normal-*-14-*-*-*-c-*-iso10646-1"
+-- verdana works with dzen-svn in from aur
+myFont = "Verdana-8"
 
-
---myWorkspaces = map show $ [1 .. 9 :: Int] ++ [0]
-myWorkspaces = ["1:main", "2:irc", "3:web", "4:dev", "5:misc", "6:ext", "7:gfx", "8:wine"]
-myTerminal = "urxvt"
+myWorkspaces = ["1:main", "2:misc", "3:web", "4:dev", "5:im", "6:mail", "7:rdesk", "8:wine"]
+--myTerminal = "urxvt"
+myTerminal = "gnome-terminal"
 myBorderWidth = 1
 myModMask = mod4Mask
 
 myStartupHook = setWMName "LG3D"
-
-
-myLayoutHook = avoidStruts $ myLayouts
-
-myLogHook :: X ()
-myLogHook = fadeInactiveLogHook fadeAmount
-    where fadeAmount = 0x88888888
 
 myManageHook = composeAll
     [ className =? "Gimp"      --> doFloat
@@ -74,9 +75,6 @@ myManageHook = composeAll
 
 myManageHook2 = manageDocks <+> myManageHook <+> manageHook defaultConfig
 
---myLayouts = ( (layoutN 1 (relBox 0 0 0.5 1) (Just $ relBox 0 0 1 1) $ simpleTabbed)
---             $ (layoutAll (relBox 0.5 0 1 1)                         $ simpleTabbed)
---             ) ||| tiled ||| simpleTabbed  ||| Full 
 myLayouts =  workspaceDir "~" $ mastered delta ratio simpleTabbed ||| tiled ||| noBorders simpleTabbed  ||| noBorders Full 
     where
      -- tabbedTwoPane = combineTwo (TwoPane delta ratio) (simpleTabbed) (simpleTabbed)
@@ -95,39 +93,78 @@ myLayouts =  workspaceDir "~" $ mastered delta ratio simpleTabbed ||| tiled ||| 
      -- Percent of screen to increment by when resizing panes
      delta   = 3/100
 
+myLayoutHook = avoidStruts $ myLayouts
 
 myKeys = [ ((mod4Mask,               xK_Right),  nextWS)
-	, ((mod4Mask,               xK_Left),    prevWS)
-	, ((mod4Mask .|. shiftMask, xK_Right),  shiftToNext)
-	, ((mod4Mask .|. shiftMask, xK_Left),    shiftToPrev)
-	, ((mod4Mask, xK_s),  swapNextScreen)
+	, ((myModMask,               xK_Left),    prevWS)
+	, ((myModMask .|. shiftMask, xK_Right),  shiftToNext)
+	, ((myModMask .|. shiftMask, xK_Left),    shiftToPrev)
+	, ((myModMask, xK_s),  swapNextScreen)
 
-	, ((mod4Mask,               xK_z),     toggleWS)
-	, ((mod4Mask, xK_g), goToSelected defaultGSConfig)
-	, ((mod4Mask .|. shiftMask, xK_j   ), rotSlavesUp)
-	, ((mod4Mask .|. shiftMask, xK_k   ), rotSlavesDown)
-	, ((mod4Mask .|. controlMask, xK_x     ), changeDir defaultXPConfig)
-	, ((mod4Mask, xK_p), shellPrompt defaultXPConfig)
-	, ((mod4Mask .|. shiftMask, xK_l), spawn "xscreensaver-command -lock")
-	, ((controlMask .|. shiftMask, xK_l), spawn "gnome-screensaver-command -l")
+	, ((myModMask,               xK_z),     toggleWS)
+	, ((myModMask, xK_g), goToSelected defaultGSConfig)
+	, ((myModMask .|. shiftMask, xK_j   ), rotSlavesUp)
+	, ((myModMask .|. shiftMask, xK_k   ), rotSlavesDown)
+	, ((myModMask .|. controlMask, xK_x     ), changeDir defaultXPConfig)
+	, ((myModMask, xK_p), shellPrompt defaultXPConfig)
+	, ((myModMask .|. shiftMask, xK_l), spawn "xscreensaver-command -lock")
 	--, ((controlMask, xK_Print), spawn "sleep 0.2; scrot -s")
 	--, ((0, xK_Print), spawn "scrot")
 	]
 	++
-	[((m .|. mod4Mask, k), windows $ f i)
+	[((m .|. myModMask, k), windows $ f i)
 	| (i, k) <- zip myWorkspaces ([xK_1 .. xK_9] ++ [xK_0])
 	, (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
-	-- [((mod4Mask .|. controlMask, k), windows $ swapWithCurrent i)
+	-- [((myModMask .|. controlMask, k), windows $ swapWithCurrent i)
 	-- | (i, k) <- zip myWorkspaces  [xK_1 ..]]
 	++
-	[((mod4Mask .|. mask, key), f sc)
+	[((myModMask .|. mask, key), f sc)
 	| (key, sc) <- zip [xK_w, xK_e] [0..]
 	, (f, mask) <- [(viewScreen, 0), (sendToScreen, shiftMask)]]
 
--- Color, font and iconpath definitions:
 
-myStatusBar = "dzen2 -x '111' -y '0' -h '16' -w '598' -ta 'l'"
-myTopBar = "conky -c .xmonad/conkyrc | dzen2 -x '700' -y '0' -h '16' -w '580' -ta 'r'"
+
+-- my info bars
+myEmptyBar = "dzen2 -e 'onstartup=lower' -x '0' -y '0' -w '1280' -h '16'"
+myStatusBar = "dzen2 -x '" ++ myDzenX  ++ "' -y '0' -h '16' -w '" ++ myDzenWidth ++ "' -ta 'l' -fn '" ++ myFont ++ "' -bg \"" ++ myBgColor ++ "\" -fg \"" ++ myFgColor ++ "\""
+
+myTopBar = "conky -c .xmonad/conkyrc | dzen2 -x '" ++ myConky ++ "' -y '0' -h '16' -w '" ++ myConkyWidth ++ "' -ta 'r' -fn '" ++ myFont ++ "' -bg \"" ++ myBgColor ++ "\" -fg \"" ++ myFgColor ++ "\""
+
+-- Log Hook
+myLogHook :: X ()
+myLogHook = fadeInactiveLogHook fadeAmount
+    where fadeAmount = 0x88888888
+
+
+-- Pretty Printing
+myDzenPP h = defaultPP
+             { ppOutput = hPutStrLn h
+             , ppCurrent = corner . fg myCurrentColor
+             , ppHidden = corner . fg myHiddenColor
+             , ppHiddenNoWindows = corner . fg myEmptyColor
+             , ppUrgent = corner . fg myUrgentColor . dzenStrip
+             , ppLayout = fg myLayoutColor .
+                          (\x -> case x of
+                          "Mirror Tall" -> "^fg(" ++ myIFGColor ++ ")^i(" ++ myIconDir ++ "/dzen_bitmaps/mtall.xbm)"
+                          "Tall"     -> "^fg(" ++ myIFGColor ++ ")^i(" ++ myIconDir ++ "/dzen_bitmaps/tall.xbm)"
+                          "Full"     -> "^fg(" ++ myIFGColor ++ ")^i(" ++ myIconDir ++ "/dzen_bitmaps/full.xbm)"
+                          "Tabbed Simplest"      -> "^fg(" ++ myIFGColor ++ ")^i(" ++ myIconDir ++ "/dzen_bitmaps/full.xbm)"
+                          "Grid"     -> "^fg(" ++ myIFGColor ++ ")^i(" ++ myIconDir ++ "/dzen_bitmaps/grid.xbm)"
+                          "TwoPane"      -> "^fg(" ++ myIFGColor ++ ")^i(" ++ myIconDir ++ "/dzen_bitmaps/two_pane.xbm)"
+                          "Mastered Tabbed Simplest"     -> "^fg(" ++ myIFGColor ++ ")^i(" ++ myIconDir ++ "/dzen_bitmaps/two_pane.xbm)"
+                          _ -> x
+                          )
+             , ppWsSep = "  "
+             , ppSep = "     "
+             , ppTitle = fg myFgColor . dzenEscape . shorten 100 . trim
+             }
+     where fg c = dzenColor c ""
+           icon n = "^i(" ++ (myIcon n) ++ ")"
+           corner = (++) (icon "corner")
+           layout n = icon ("layout-" ++ n)
+
+
+
 
 main = do
     xmproc <- spawnPipe myStatusBar
@@ -137,16 +174,7 @@ main = do
         , layoutHook = myLayoutHook
         , startupHook = myStartupHook
         , workspaces = myWorkspaces
-        , logHook = dynamicLogWithPP ( dzenPP
-						{ ppOutput = hPutStrLn xmproc
-						, ppLayout   = dzenColor "green" "" .
-						(\ x -> case x of
-						 "Mastered Tabbed Simplest" -> "TwoPane"
-						 "Full"			-> " Full "
-						 "Tabbed Simplest"	-> " Tab "
-						 _				-> pad x
-						)
-											}) >> myLogHook
+		, logHook = myLogHook >> (dynamicLogWithPP $ myDzenPP xmproc)
         , modMask = myModMask
 		, terminal = myTerminal
-        } `additionalKeys` myKeys
+       } `additionalKeys` myKeys

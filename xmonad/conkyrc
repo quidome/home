@@ -7,4 +7,12 @@ total_run_times 0
 use_spacer none
 
 TEXT
-^fg()anp: ${execi 180 sh .xmonad/gmail.sh} cra: ${execi 180 sh .xmonad/reader.sh} cpu: ${cpu}% mem: ${memperc}% swap: ${swapperc}% batt: ${battery_percent BAT0}% ^fg()${time %d/%m %H:%M}
+^fg(\#88591b)a ^fg(\#777777) ${execi 180 sh .xmonad/anp.sh}  \
+^fg(\#88591b)c ^fg(\#777777) ${execi 180 sh .xmonad/cramer.sh}  \
+^fg(\#2c4b50)^i(${HOME}/.xmonad/dzen/cpu.xbm) ^fg(\#777777)${cpu cpu0}%  \
+^fg(\#366136)^i(${HOME}/.xmonad/dzen/ram.xbm) ^fg(\#777777)${memperc}%  \
+^fg(\#88591b)^i(${HOME}/.xmonad/dzen/up.xbm) ^fg(\#777777)${if_up eth0}${upspeedf eth0}${else}${upspeedf wlan0}${endif}K/s  \
+^fg(\#6b2c74)^i(${HOME}/.xmonad/dzen/down.xbm) ^fg(\#777777)${if_up eth0}${downspeedf eth0}${else}${downspeedf wlan0}${endif}K/s  \
+^fg(\#7c3131)${if_match "on-line" == "${acpiacadapter}"}^i(${HOME}/.xmonad/dzen/battery_ac.xbm)${else}${if_match 20 > ${battery_percent}}^i(${HOME}/.xmonad/dzen/battery_low.xbm)${else}^i(${HOME}/.xmonad/dzen/battery_full.xbm)${endif}${endif} ^fg(\#777777)${battery_percent}%   \
+^fg(\#2c4b50)^i(${HOME}/.xmonad/dzen/pacman.xbm) ^fg(\#777777)${execi 180 sh .xmonad/pacman.sh}  \
+^fg(\#bbbbbb)${time %d/%m %H.%M}
